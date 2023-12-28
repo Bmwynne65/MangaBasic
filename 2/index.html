@@ -1,0 +1,27 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MangaDex Search</title>
+</head>
+<body>
+  <h1>MangaDex Search</h1>
+  <form id="searchForm">
+    <label for="mangaTitle">Enter Manga Title:</label>
+    <input type="text" id="mangaTitle" name="mangaTitle" required>
+    <button type="submit">Search</button>
+  </form>
+
+  <script>
+    document.getElementById("searchForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const title = document.getElementById("mangaTitle").value;
+      // Redirect to the results page with the title as a query parameter
+      window.location.href = `results.html?title=${encodeURIComponent(title)}`;
+    });
+  </script>
+</body>
+</html>

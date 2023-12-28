@@ -19,7 +19,9 @@ async function searchManga() {
         }
     });
 
-    console.log(searchResp.data.data.map(manga => manga.id));
+    const title = 'Kanojyo to Himitsu to Koimoyou';
+
+    console.log(resp.data.data.map(manga => manga.id));
     // Get the first manga ID from the search result
     const mangaId = searchResp.data.data[0].id;
 

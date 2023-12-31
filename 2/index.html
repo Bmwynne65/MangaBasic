@@ -1,27 +1,71 @@
-<!-- index.html -->
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MangaDex Search</title>
+  <title>Manga Search</title>
 </head>
+
 <body>
-  <h1>MangaDex Search</h1>
-  <form id="searchForm">
-    <label for="mangaTitle">Enter Manga Title:</label>
-    <input type="text" id="mangaTitle" name="mangaTitle" required>
-    <button type="submit">Search</button>
-  </form>
+  <div class="search-container">
+    <form class="search-bar" onsubmit="searchManga(event)">
+      <input type="text" id="searchInput" placeholder="Search..." name="q">
+      <button type="submit"><span class="material-icons">search</span></button>
+    </form>
+  </div>
 
   <script>
-    document.getElementById("searchForm").addEventListener("submit", function(event) {
+    function searchManga(event) {
       event.preventDefault();
-      const title = document.getElementById("mangaTitle").value;
-      // Redirect to the results page with the title as a query parameter
-      window.location.href = `results.html?title=${encodeURIComponent(title)}`;
-    });
+
+      const title = document.getElementById("searchInput").value;
+      const base_url = "https://api.mangadex.org";
+
+      fetch(`${base_url}/manga?title=${title}`)
+        .then(response => response.json())
+        .then(data => {
+          const mangaIds = data.data.map(manga => manga.id);
+          const mangaTitleLink = `${base_url}/manga/${mangaIds[0]}`;
+          const coverLink = `${base_url}/cover/${mangaIds[0]}`;
+
+          // Fetch manga title details
+          fetch(mangaTitleLink)
+            .then(response => response.json())
+            .then(mangaTitleData => {
+              // Fetch cover details
+              return fetch(coverLink)
+                .then(response => response.json())
+                .then(coverData => ({ mangaTitleData, coverData }));
+            })
+            .then(({ mangaTitleData, coverData }) => {
+              // Extract cover image information
+              const coverImgFileName = coverData.data.attributes.fileName;
+              const base_CoverImg = `https://uploads.mangadex.org/covers/${mangaIds[0]}/${coverImgFileName}`;
+
+              // Generate HTML page with cover image
+              const htmlPage = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>${mangaTitleData.data.attributes.title}</title>
+                </head>
+                <body>
+                  <h1>${mangaTitleData.data.attributes.title}</h1>
+                  <img src="${base_CoverImg}" alt="Manga Cover">
+                </body>
+                </html>
+              `;
+
+              console.log(htmlPage);
+            })
+            .catch(error => console.error(error));
+        })
+        .catch(error => console.error(error));
+    }
   </script>
 </body>
+
 </html>
